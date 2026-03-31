@@ -1,0 +1,13 @@
+﻿namespace UrbanCare.Application.DTOs.Responses
+{
+    public record BuildingResponseDTO(
+        int Id,
+        string Number,
+        string Address,
+        RegionResponseDTO Region,
+        BuildingTypeResponseDTO BuildingType,
+        short YearBuit,
+        int FloorCount,
+        WallMaterialResponseDTO WallMaterial,
+        FloorMaterialResponseDTO FloorMaterial);
+}
