@@ -197,7 +197,7 @@ namespace UrbanCare.Application.Services
             List<OrderMaterialResponseDTO>? orderMaterialDTOs = null;
 
             if (orderMaterials != null && orderMaterials.Count > 0)
-                orderMaterials.Select(om => new OrderMaterialResponseDTO(
+                orderMaterialDTOs = orderMaterials.Select(om => new OrderMaterialResponseDTO(
                     om.Id,
                     om.OrderId,
                     new(
