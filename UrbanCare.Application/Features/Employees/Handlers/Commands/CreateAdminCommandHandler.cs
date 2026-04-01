@@ -2,6 +2,7 @@
 using UrbanCare.Application.DTOs.Common;
 using UrbanCare.Application.Features.Employees.Commands;
 using UrbanCare.Domain.Entities;
+using UrbanCare.Domain.Enums;
 using UrbanCare.Domain.Interfaces.Repositories;
 
 namespace UrbanCare.Application.Features.Employees.Handlers.Commands
@@ -56,7 +57,7 @@ namespace UrbanCare.Application.Features.Employees.Handlers.Commands
             //if (_employeeRepository.GetAdminByManagementCompanyAsync(request.EmployeeCreateRequestDTO.ManagementCompanyId, cancellationToken) != null)
             //    return new List<ErrorDTO> { new("ManagementCompany", "У этой УК уже существует администратор") };
 
-            if (request.EmployeeCreateRequestDTO.EmployeePositionId != 1)
+            if (request.EmployeeCreateRequestDTO.EmployeePositionId != (int)RolesEnum.Admin)
                 return new List<ErrorDTO> { new("EmployeePosition", "Администратор может быть только на позиции \"Руководитель управляющей компании\"") };
 
             int newId = await _employeeRepository.GetNextIdAsync(cancellationToken);

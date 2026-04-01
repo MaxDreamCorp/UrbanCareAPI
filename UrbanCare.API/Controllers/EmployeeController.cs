@@ -29,6 +29,24 @@ namespace UrbanCare.API.Controllers
             return Ok();
         }
 
+        [HttpPost("create_dispatcher")]
+        public async Task<IActionResult> CreateDispatcher(CreateDispatcherCommand cmd)
+        {
+            try
+            {
+                var result = await _mediator.Send(cmd);
+
+                if (!result)
+                    return BadRequest("Не удалось создать диспетчера");
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [Authorize(Policy = "EmployeePolicy")]
         [HttpGet("get_my_employee")]
         public async Task<IActionResult> GetMyEmployee()
