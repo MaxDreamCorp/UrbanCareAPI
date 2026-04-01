@@ -1,7 +1,7 @@
 ﻿namespace UrbanCare.Application.DTOs.Responses
 {
     public record EmployeeDataResponseDTO(int Id,
-        int UserId,
+        UserDataResponseDTO UserData,
         ManagementCompanyResponseDTO ManagementCompany,
         EmployeePositionResponseDTO EmployeePosition,
         EmployeeStatusResponseDTO EmployeeStatus,

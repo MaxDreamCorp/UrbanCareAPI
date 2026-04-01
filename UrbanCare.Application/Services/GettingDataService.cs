@@ -9,6 +9,8 @@ namespace UrbanCare.Application.Services
         private readonly IApartmentRepository _apartmentRepository;
         private readonly IRegionRepository _regionRepository;
         private readonly IManagementCompanyRepository _managementCompanyRepository;
+        private readonly IEmployeeRepository _employeeRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IResidentRepository _residentRepository;
         private readonly IOrderRepository _orderRepository;
 
@@ -17,7 +19,9 @@ namespace UrbanCare.Application.Services
                                   IManagementCompanyRepository managementCompanyRepository,
                                   IApartmentRepository apartmentRepository,
                                   IResidentRepository residentRepository,
-                                  IOrderRepository orderRepository)
+                                  IOrderRepository orderRepository,
+                                  IEmployeeRepository employeeRepository,
+                                  IUserRepository userRepository)
         {
             _buildingRepository = buildingRepository;
             _regionRepository = regionRepository;
@@ -25,6 +29,8 @@ namespace UrbanCare.Application.Services
             _apartmentRepository = apartmentRepository;
             _residentRepository = residentRepository;
             _orderRepository = orderRepository;
+            _employeeRepository = employeeRepository;
+            _userRepository = userRepository;
         }
 
         public async Task<BuildingResponseDTO> GetBuildingResponseDTOByBuildingIdAsync(int buildingId, CancellationToken cancellationToken = default)
@@ -115,6 +121,46 @@ namespace UrbanCare.Application.Services
                  resident.IsLiving == 1);
         }
 
+        public async Task<EmployeeDataResponseDTO> GetEmployeeDataResponseDTOByEmployeeIdAsync(int employeeId, CancellationToken cancellationToken = default)
+        {
+            var employee = await _employeeRepository.GetByIdAsync(employeeId, cancellationToken);
+
+            if (employee == null)
+                throw new Exception("Данного сотрудника не существует");
+
+            var user = await _userRepository.GetUserByUserIdAsync(employee.UserId, cancellationToken);
+
+            if (user == null)
+                throw new Exception("Пользователя сотрудника не существует");
+
+            return new EmployeeDataResponseDTO(
+                employee.Id,
+                new(
+                    user.Id,
+                    user.Fullname,
+                    user.Email,
+                    user.Phone,
+                    user.RoleId,
+                    user.UserPersonalData.DateOfBirth),
+                new(employee.ManagementCompany.Id,
+                    employee.ManagementCompany.Name,
+                    employee.ManagementCompany.Address),
+                new(employee.EmployeePosition.Id,
+                    employee.EmployeePosition.Name,
+                    employee.EmployeePosition.Description),
+                new(employee.Status.Id,
+                    employee.Status.Status),
+                new(employee.QualificationCategory.Id,
+                    employee.QualificationCategory.Name,
+                    employee.QualificationCategory.Code,
+                    employee.QualificationCategory.MinExperienceYears,
+                    employee.QualificationCategory.SalaryCoefficient),
+                employee.EmploymentDate,
+                employee.ExperienceYears,
+                employee.Salary,
+                employee.Notes);
+        }
+
         public async Task<OrderResponseDTO> GetOrderResponseDTOByOrderIdAsync(int orderId, CancellationToken cancellationToken = default)
         {
             var order = await _orderRepository.GetByIdAsync(orderId, cancellationToken);
@@ -133,7 +179,24 @@ namespace UrbanCare.Application.Services
 
             var orderMaterials = await _orderRepository.GetOrderMaterialsByIdAsync(orderId, cancellationToken);
 
-            var orderMaterialDTOs = orderMaterials == null ? null :
+            EmployeeDataResponseDTO? dispatcherDTO = null;
+            if (order.DispatcherId != null)
+                dispatcherDTO = await GetEmployeeDataResponseDTOByEmployeeIdAsync(order.DispatcherId.Value, cancellationToken);
+
+            List<EmployeeDataResponseDTO>? orderExecutorDTOs = null;
+
+            if (order.OrderExecutors != null)
+            {
+                foreach (var orderExecutor in order.OrderExecutors)
+                {
+                    var executorDTO = await GetEmployeeDataResponseDTOByEmployeeIdAsync(orderExecutor.ExecutorId, cancellationToken);
+                    orderExecutorDTOs!.Add(executorDTO);
+                }
+            }
+
+            List<OrderMaterialResponseDTO>? orderMaterialDTOs = null;
+
+            if (orderMaterials != null && orderMaterials.Count > 0)
                 orderMaterials.Select(om => new OrderMaterialResponseDTO(
                     om.Id,
                     om.OrderId,
@@ -164,7 +227,12 @@ namespace UrbanCare.Application.Services
                 new(
                     order.Status.Id,
                     order.Status.Status),
+                dispatcherDTO,
                 order.CreatedAt,
+                order.ChangedAt,
+                order.AcceptedAt,
+                order.CompletedAt,
+                orderExecutorDTOs,
                 orderMaterialDTOs);
         }
     }
