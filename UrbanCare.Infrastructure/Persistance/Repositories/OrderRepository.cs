@@ -45,6 +45,11 @@ namespace UrbanCare.Infrastructure.Persistance.Repositories
             return 1;
         }
 
+        public async Task<List<OrderExecutor>?> GetOrderExecutorsByIdAsync(int id, CancellationToken cancellationToken = default)
+        {
+            return await _context.OrderExecutors.Where(oe => oe.OrderId == id).ToListAsync(cancellationToken);
+        }
+
         public async Task<List<OrderMaterial>?> GetOrderMaterialsByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             return await _context.OrderMaterials

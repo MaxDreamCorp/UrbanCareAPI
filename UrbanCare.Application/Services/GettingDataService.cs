@@ -183,14 +183,18 @@ namespace UrbanCare.Application.Services
             if (order.DispatcherId != null)
                 dispatcherDTO = await GetEmployeeDataResponseDTOByEmployeeIdAsync(order.DispatcherId.Value, cancellationToken);
 
-            List<EmployeeDataResponseDTO>? orderExecutorDTOs = null;
+            var orderExecutors = await _orderRepository.GetOrderExecutorsByIdAsync(orderId, cancellationToken);
 
-            if (order.OrderExecutors != null)
+            List<OrderExecutorResponseDTO>? orderExecutorDTOs = null;
+
+            if (orderExecutors != null)
             {
-                foreach (var orderExecutor in order.OrderExecutors)
+                foreach (var orderExecutor in orderExecutors)
                 {
+                    if (orderExecutorDTOs == null)
+                        orderExecutorDTOs = new List<OrderExecutorResponseDTO>();
                     var executorDTO = await GetEmployeeDataResponseDTOByEmployeeIdAsync(orderExecutor.ExecutorId, cancellationToken);
-                    orderExecutorDTOs!.Add(executorDTO);
+                    orderExecutorDTOs!.Add(new(executorDTO, orderExecutor.WorkPayment));
                 }
             }
 

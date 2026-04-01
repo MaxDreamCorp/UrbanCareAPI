@@ -459,6 +459,10 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.ExecutorId).HasColumnName("executor_id");
             entity.Property(e => e.OrderId).HasColumnName("order_id");
 
+            entity.Property(e => e.WorkPayment)
+                .HasPrecision(10, 2)
+                .HasColumnName("work_payment");
+
             entity.HasOne(d => d.Executor).WithMany(p => p.OrderExecutors)
                 .HasForeignKey(d => d.ExecutorId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
