@@ -48,5 +48,21 @@ namespace UrbanCare.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet("get_company_in_progress_orders/{managementCompanyId}")]
+        public async Task<IActionResult> GetCompanyInProgressOrders(int managementCompanyId)
+        {
+            try
+            {
+                var qry = new GetCompanyInProgressOrdersQuery(managementCompanyId);
+                var response = await _mediator.Send(qry);
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+    }
 }
