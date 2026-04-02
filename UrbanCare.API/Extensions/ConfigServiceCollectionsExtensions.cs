@@ -88,7 +88,7 @@ namespace UrbanCare.API.Extensions
             {
                 option.AddPolicy("AdminPolicy", policy =>
                 {
-                    policy.RequireClaim("roleId", "2");
+                    policy.RequireClaim("roleId", ((int)RolesEnum.Admin).ToString());
                 });
                 option.AddPolicy("EmployeePolicy", policy =>
                 {
@@ -104,7 +104,11 @@ namespace UrbanCare.API.Extensions
                 });
                 option.AddPolicy("ResidentPolicy", policy =>
                 {
-                    policy.RequireClaim("roleId", "6");
+                    policy.RequireClaim("roleId", ((int)RolesEnum.Resident).ToString());
+                });
+                option.AddPolicy("DispatcherPolicy", policy =>
+                {
+                    policy.RequireClaim("roleId", ((int)RolesEnum.Dispatcher).ToString());
                 });
             });
         }

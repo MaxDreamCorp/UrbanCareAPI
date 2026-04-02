@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using UrbanCare.Domain.Entities;
+using UrbanCare.Domain.Enums;
 using UrbanCare.Domain.Interfaces.Repositories;
 
 namespace UrbanCare.Infrastructure.Persistance.Repositories
@@ -80,6 +81,29 @@ namespace UrbanCare.Infrastructure.Persistance.Repositories
                 .Include(e => e.QualificationCategory)
                 .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 
+        }
+
+        public async Task<List<Employee>?> GetExecutorsByManagementCompanyIdAsync(int companyId, CancellationToken cancellationToken = default)
+        {
+            return await _context.Employees
+                .Include(e => e.ManagementCompany)
+                .Include(e => e.EmployeePosition)
+                .Include(e => e.QualificationCategory)
+                .Include(e => e.Status)
+                .Where(e => e.ManagementCompanyId == companyId && e.User.RoleId == (int)RolesEnum.Executor)
+                .ToListAsync();
+        }
+
+        public async Task<int> GetExecutorActiveTasksCountAsync(int executorId, CancellationToken cancellationToken = default)
+        {
+            return await _context.Orders.CountAsync(o => o.Status.Id == (int)OrderStatusEnum.InProgress
+                && o.OrderExecutors.Any(oe => oe.Id == executorId), cancellationToken);
+        }
+
+        public async Task<int> GetExecutorFinishedTasksCountAsync(int executorId, CancellationToken cancellationToken = default)
+        {
+            return await _context.Orders.CountAsync(o => o.Status.Id == (int)OrderStatusEnum.Finished
+               && o.OrderExecutors.Any(oe => oe.Id == executorId), cancellationToken);
         }
     }
 }
