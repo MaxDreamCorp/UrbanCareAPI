@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using UrbanCare.Domain.Entities;
+using UrbanCare.Domain.Enums;
 using UrbanCare.Domain.Interfaces.Repositories;
 
 namespace UrbanCare.Infrastructure.Persistance.Repositories
@@ -28,6 +29,16 @@ namespace UrbanCare.Infrastructure.Persistance.Repositories
                 .FirstOrDefaultAsync(o => o.Id == id, cancellationToken);
         }
 
+        public async Task<List<Order>> GetByManagementCompanyIdAsync(int managementCompanyId, CancellationToken cancellationToken = default)
+        {
+            return await _context.Orders.Include(o => o.OrderCategory)
+                   .ThenInclude(oc => oc.Type)
+               .Include(o => o.Priority)
+               .Include(o => o.Status)
+               .Where(o => o.Resident.Apartment.Building.Region.ManagementCompanyId == managementCompanyId)
+               .ToListAsync(cancellationToken);
+        }
+
         public async Task<List<Order>> GetByResidentIdAsync(int residentId, CancellationToken cancellationToken = default)
         {
             return await _context.Orders.Include(o => o.OrderCategory)
@@ -35,6 +46,28 @@ namespace UrbanCare.Infrastructure.Persistance.Repositories
                .Include(o => o.Priority)
                .Include(o => o.Status)
                .Where(o => o.ResidentId == residentId)
+               .ToListAsync(cancellationToken);
+        }
+
+        public async Task<List<Order>> GetInProgressByManagementCompanyIdAsync(int managementCompanyId, CancellationToken cancellationToken = default)
+        {
+            return await _context.Orders.Include(o => o.OrderCategory)
+                   .ThenInclude(oc => oc.Type)
+               .Include(o => o.Priority)
+               .Include(o => o.Status)
+               .Where(o => o.Resident.Apartment.Building.Region.ManagementCompanyId == managementCompanyId
+                   && o.Status.Id == (int)OrderStatusEnum.InProgress)
+               .ToListAsync(cancellationToken);
+        }
+
+        public async Task<List<Order>> GetNewByManagementCompanyIdAsync(int managementCompanyId, CancellationToken cancellationToken = default)
+        {
+            return await _context.Orders.Include(o => o.OrderCategory)
+                   .ThenInclude(oc => oc.Type)
+               .Include(o => o.Priority)
+               .Include(o => o.Status)
+               .Where(o => o.Resident.Apartment.Building.Region.ManagementCompanyId == managementCompanyId
+                   && o.Status.Id == (int)OrderStatusEnum.New)
                .ToListAsync(cancellationToken);
         }
 

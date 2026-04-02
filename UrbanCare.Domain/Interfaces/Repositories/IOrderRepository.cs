@@ -12,5 +12,8 @@ namespace UrbanCare.Domain.Interfaces.Repositories
         Task<List<Order>> GetByResidentIdAsync(int residentId, CancellationToken cancellationToken = default);
         Task<List<OrderMaterial>?> GetOrderMaterialsByIdAsync(int id, CancellationToken cancellationToken = default);
         Task<List<OrderExecutor>?> GetOrderExecutorsByIdAsync(int id, CancellationToken cancellationToken = default);
+        Task<List<Order>> GetByManagementCompanyIdAsync(int managementCompanyId, CancellationToken cancellationToken = default);
+        Task<List<Order>> GetNewByManagementCompanyIdAsync(int managementCompanyId, CancellationToken cancellationToken = default);
+        Task<List<Order>> GetInProgressByManagementCompanyIdAsync(int managementCompanyId, CancellationToken cancellationToken = default);
     }
 }
