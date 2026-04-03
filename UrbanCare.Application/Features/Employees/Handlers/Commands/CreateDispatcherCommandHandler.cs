@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using MediatR;
 using UrbanCare.Application.Features.Employees.Commands;
 using UrbanCare.Domain.Entities;
+using UrbanCare.Domain.Enums;
 using UrbanCare.Domain.Interfaces.Repositories;
 
 namespace UrbanCare.Application.Features.Employees.Handlers.Commands
@@ -60,6 +61,9 @@ namespace UrbanCare.Application.Features.Employees.Handlers.Commands
             var managementCompany = await _managementCompanyRepository.GetByIdAsync(request.EmployeeCreateRequestDTO.ManagementCompanyId, cancellationToken);
             if (managementCompany == null)
                 throw new Exception("Такой управляющей компании не существует");
+
+            if (user.RoleId != (int)RolesEnum.Dispatcher)
+                throw new Exception("Пользователь должен иметь роль \"Диспетчер\"");
 
             if (employeePosition.Id != 3)
                 throw new Exception("Неверная позиция для диспетчера");

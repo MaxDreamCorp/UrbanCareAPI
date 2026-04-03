@@ -61,6 +61,9 @@ namespace UrbanCare.Application.Features.Employees.Handlers.Commands
             if (managementCompany == null)
                 throw new Exception("Такой управляющей компании не существует");
 
+            if (qualPosition.Id < 3)
+                throw new Exception("Неверная квалификация для исполнителя");
+
             if (employeePosition.Id < 3)
                 throw new Exception("Неверная позиция для исполнителя");
 
