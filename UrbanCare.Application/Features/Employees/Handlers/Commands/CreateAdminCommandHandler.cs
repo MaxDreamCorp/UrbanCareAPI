@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using UrbanCare.Application.DTOs.Common;
 using UrbanCare.Application.Features.Employees.Commands;
 using UrbanCare.Domain.Entities;
 using UrbanCare.Domain.Enums;
@@ -7,7 +6,7 @@ using UrbanCare.Domain.Interfaces.Repositories;
 
 namespace UrbanCare.Application.Features.Employees.Handlers.Commands
 {
-    public class CreateAdminCommandHandler : IRequestHandler<CreateAdminCommand, List<ErrorDTO>?>
+    public class CreateAdminCommandHandler : IRequestHandler<CreateAdminCommand, bool>
     {
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IUserRepository _userRepository;
@@ -31,7 +30,7 @@ namespace UrbanCare.Application.Features.Employees.Handlers.Commands
             _managementCompanyRepository = managementCompanyRepository;
         }
 
-        public async Task<List<ErrorDTO>?> Handle(CreateAdminCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(CreateAdminCommand request, CancellationToken cancellationToken)
         {
             var user = await _userRepository.GetUserByUserIdAsync(request.EmployeeCreateRequestDTO.UserId, cancellationToken);
             var employeePosition = await _employeePositionRepository.GetByIdAsync(request.EmployeeCreateRequestDTO.EmployeePositionId, cancellationToken);
@@ -40,51 +39,44 @@ namespace UrbanCare.Application.Features.Employees.Handlers.Commands
             var managementCompany = await _managementCompanyRepository.GetByIdAsync(request.EmployeeCreateRequestDTO.ManagementCompanyId, cancellationToken);
 
             if (user == null)
-                return new List<ErrorDTO> { new("UserId", "Такого пользователя не существует") };
+                throw new Exception("Такого пользователя не существует");
 
             if (employeePosition == null)
-                return new List<ErrorDTO> { new("EmployeePositionId", "Такой позиции не существует") };
+                throw new Exception("Такой позиции не существует");
 
             if (qualPosition == null)
-                return new List<ErrorDTO> { new("QualificationCategoryId", "Такой квалификации не существует") };
+                throw new Exception("Такой квалификации не существует");
 
             if (employeeStatus == null)
-                return new List<ErrorDTO> { new("EmployeeStatusId", "Такого статуса не существует") };
+                throw new Exception("Такого статуса не существует");
 
             if (managementCompany == null)
-                return new List<ErrorDTO> { new("ManagementCompanyId", "Такой управляющей компании не существует") };
+                throw new Exception("Такой управляющей компании не существует");
 
-            //if (_employeeRepository.GetAdminByManagementCompanyAsync(request.EmployeeCreateRequestDTO.ManagementCompanyId, cancellationToken) != null)
-            //    return new List<ErrorDTO> { new("ManagementCompany", "У этой УК уже существует администратор") };
+            if (_employeeRepository.GetAdminByManagementCompanyAsync(request.EmployeeCreateRequestDTO.ManagementCompanyId, cancellationToken) != null)
+                throw new Exception("У этой УК уже существует администратор");
 
             if (user.RoleId != (int)RolesEnum.Admin)
-                return new List<ErrorDTO> { new("UserId", "Пользователь должен иметь роль \"Администратор\"") };
+                throw new Exception("Пользователь должен иметь роль \"Администратор\"");
 
             if (request.EmployeeCreateRequestDTO.EmployeePositionId != (int)RolesEnum.Admin)
-                return new List<ErrorDTO> { new("EmployeePosition", "Администратор может быть только на позиции \"Руководитель управляющей компании\"") };
+                throw new Exception("Администратор может быть только на позиции \"Руководитель управляющей компании\"");
 
             int newId = await _employeeRepository.GetNextIdAsync(cancellationToken);
 
-            try
-            {
-                var employeeAdmin = Employee.Create(newId,
-                    user,
-                    managementCompany,
-                    employeePosition,
-                    qualPosition,
-                    request.EmployeeCreateRequestDTO.EmploymentDate,
-                    request.EmployeeCreateRequestDTO.ExpereienceYears,
-                    request.EmployeeCreateRequestDTO.Salary,
-                    employeeStatus,
-                    request.EmployeeCreateRequestDTO.Notes);
+            var employeeAdmin = Employee.Create(newId,
+                 user,
+                 managementCompany,
+                 employeePosition,
+                 qualPosition,
+                 request.EmployeeCreateRequestDTO.EmploymentDate,
+                 request.EmployeeCreateRequestDTO.ExpereienceYears,
+                 request.EmployeeCreateRequestDTO.Salary,
+                 employeeStatus,
+                 request.EmployeeCreateRequestDTO.Notes);
 
-                await _employeeRepository.AddAsync(employeeAdmin, cancellationToken);
-                return null;
-            }
-            catch (Exception ex)
-            {
-                return new() { new ErrorDTO("All", ex.Message) };
-            }
+            await _employeeRepository.AddAsync(employeeAdmin, cancellationToken);
+            return true;
         }
     }
 }

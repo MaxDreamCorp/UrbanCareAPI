@@ -4,5 +4,5 @@ using UrbanCare.Application.DTOs.Requests;
 
 namespace UrbanCare.Application.Features.Employees.Commands
 {
-    public record CreateAdminCommand(EmployeeCreateRequestDTO EmployeeCreateRequestDTO) : IRequest<List<ErrorDTO>?>;
+    public record CreateAdminCommand(EmployeeCreateRequestDTO EmployeeCreateRequestDTO) : IRequest<bool>;
 }

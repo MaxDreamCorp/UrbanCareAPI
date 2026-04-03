@@ -20,13 +20,19 @@ namespace UrbanCare.API.Controllers
         [HttpPost("create_admin")]
         public async Task<IActionResult> CreateAdmin(CreateAdminCommand cmd)
         {
+            try
+            {
+                var result = await _mediator.Send(cmd);
 
-            var response = await _mediator.Send(cmd);
+                if (!result)
+                    return BadRequest("Не удалось создать администратора");
 
-            if (response != null)
-                return BadRequest(response);
-
-            return Ok();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost("create_dispatcher")]
