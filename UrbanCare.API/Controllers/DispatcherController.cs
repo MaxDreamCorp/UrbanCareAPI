@@ -33,6 +33,22 @@ namespace UrbanCare.API.Controllers
             }
         }
 
+        [HttpGet("get_company_orders/{managementCompanyId}")]
+        public async Task<IActionResult> GetCompanyOrders(int managementCompanyId)
+        {
+            try
+            {
+                var qry = new GetCompanyOrdersQuery(managementCompanyId);
+                var response = await _mediator.Send(qry);
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpGet("get_company_new_orders/{managementCompanyId}")]
         public async Task<IActionResult> GetCompanyNewOrders(int managementCompanyId)
         {
