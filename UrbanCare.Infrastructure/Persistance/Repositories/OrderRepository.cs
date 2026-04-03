@@ -49,27 +49,17 @@ namespace UrbanCare.Infrastructure.Persistance.Repositories
                .ToListAsync(cancellationToken);
         }
 
-        public async Task<List<Order>> GetInProgressByManagementCompanyIdAsync(int managementCompanyId, CancellationToken cancellationToken = default)
+        public async Task<List<Order>> GetByManagementCompanyIdAndStatusAsync(int managementCompanyId, OrderStatusEnum status, CancellationToken cancellationToken = default)
         {
             return await _context.Orders.Include(o => o.OrderCategory)
                    .ThenInclude(oc => oc.Type)
                .Include(o => o.Priority)
                .Include(o => o.Status)
                .Where(o => o.Resident.Apartment.Building.Region.ManagementCompanyId == managementCompanyId
-                   && o.Status.Id == (int)OrderStatusEnum.InProgress)
+                   && o.Status.Id == (int)status)
                .ToListAsync(cancellationToken);
         }
 
-        public async Task<List<Order>> GetNewByManagementCompanyIdAsync(int managementCompanyId, CancellationToken cancellationToken = default)
-        {
-            return await _context.Orders.Include(o => o.OrderCategory)
-                   .ThenInclude(oc => oc.Type)
-               .Include(o => o.Priority)
-               .Include(o => o.Status)
-               .Where(o => o.Resident.Apartment.Building.Region.ManagementCompanyId == managementCompanyId
-                   && o.Status.Id == (int)OrderStatusEnum.New)
-               .ToListAsync(cancellationToken);
-        }
 
         public async Task<int> GetNextIdAsync(CancellationToken cancellationToken = default)
         {

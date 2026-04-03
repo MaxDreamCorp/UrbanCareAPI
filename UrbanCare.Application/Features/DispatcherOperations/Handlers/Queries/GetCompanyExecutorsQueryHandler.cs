@@ -37,7 +37,7 @@ namespace UrbanCare.Application.Features.DispatcherOperations.Handlers.Queries
                 var executorDTO = new ExecutorResponseDTO(
                     employeeDTO,
                     await _employeeRepository.GetExecutorActiveTasksCountAsync(executor.Id, cancellationToken),
-                    await _employeeRepository.GetExecutorFinishedTasksCountAsync(executor.Id, cancellationToken));
+                    await _employeeRepository.GetExecutorCompletedTasksCountAsync(executor.Id, cancellationToken));
 
                 executorDTOs.Add(executorDTO);
             }

@@ -25,7 +25,7 @@ namespace UrbanCare.Application.Features.DispatcherOperations.Handlers.Queries
             if (managementCompany == null)
                 throw new Exception("Управляющая компания не найдена");
 
-            var orders = await _orderRepository.GetNewByManagementCompanyIdAsync(request.ManagementCompanyId, cancellationToken);
+            var orders = await _orderRepository.GetByManagementCompanyIdAndStatusAsync(request.ManagementCompanyId, Domain.Enums.OrderStatusEnum.New, cancellationToken);
 
             var orderResponseDTOs = new List<OrderResponseDTO>();
             foreach (var order in orders)

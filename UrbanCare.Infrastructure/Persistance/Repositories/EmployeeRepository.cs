@@ -100,9 +100,9 @@ namespace UrbanCare.Infrastructure.Persistance.Repositories
                 && o.OrderExecutors.Any(oe => oe.Id == executorId), cancellationToken);
         }
 
-        public async Task<int> GetExecutorFinishedTasksCountAsync(int executorId, CancellationToken cancellationToken = default)
+        public async Task<int> GetExecutorCompletedTasksCountAsync(int executorId, CancellationToken cancellationToken = default)
         {
-            return await _context.Orders.CountAsync(o => o.Status.Id == (int)OrderStatusEnum.Finished
+            return await _context.Orders.CountAsync(o => o.Status.Id == (int)OrderStatusEnum.Completed
                && o.OrderExecutors.Any(oe => oe.Id == executorId), cancellationToken);
         }
     }
