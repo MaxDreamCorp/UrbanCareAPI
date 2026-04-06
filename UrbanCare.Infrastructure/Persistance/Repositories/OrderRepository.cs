@@ -174,5 +174,15 @@ namespace UrbanCare.Infrastructure.Persistance.Repositories
             order.CompletedAt = completionDate;
             await _context.SaveChangesAsync(cancellationToken);
         }
+
+        public async Task<List<Order>> GetByExecutorIdAsync(int executorId, CancellationToken cancellationToken = default)
+        {
+            return await _context.Orders.Include(o => o.OrderCategory)
+                   .ThenInclude(oc => oc.Type)
+               .Include(o => o.Priority)
+               .Include(o => o.Status)
+               .Where(o => o.OrderExecutors.Any(oe => oe.ExecutorId == executorId))
+               .ToListAsync(cancellationToken);
+        }
     }
 }

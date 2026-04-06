@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UrbanCare.Application.Features.ExecutorOperations.Commands;
+using UrbanCare.Application.Features.ExecutorOperations.Queries;
 
 namespace UrbanCare.API.Controllers
 {
@@ -15,6 +16,26 @@ namespace UrbanCare.API.Controllers
         public ExecutorController(IMediator mediator)
         {
             _mediator = mediator;
+        }
+
+        [HttpGet("get_executor_orders")]
+        public async Task<IActionResult> GetExecutorOrders()
+        {
+            var userIdClaim = HttpContext.User.FindFirst("userId")?.Value;
+            if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
+                return Forbid();
+
+            var query = new GetExecutorOrdersQuery(userId);
+
+            try
+            {
+                var orders = await _mediator.Send(query);
+                return Ok(orders);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPut("update_status_to_available")]
