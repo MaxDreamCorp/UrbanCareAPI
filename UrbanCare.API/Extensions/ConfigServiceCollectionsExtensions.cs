@@ -110,6 +110,10 @@ namespace UrbanCare.API.Extensions
                 {
                     policy.RequireClaim("roleId", ((int)RolesEnum.Dispatcher).ToString());
                 });
+                option.AddPolicy("ExecutorPolicy", policy =>
+                    {
+                        policy.RequireClaim("roleId", ((int)RolesEnum.Executor).ToString());
+                    });
             });
         }
     }

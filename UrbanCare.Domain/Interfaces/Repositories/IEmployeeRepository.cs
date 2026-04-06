@@ -9,6 +9,7 @@ namespace UrbanCare.Domain.Interfaces.Repositories
         Task<int> GetNextIdAsync(CancellationToken cancellationToken = default);
         Task<Employee?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
         Task<Employee?> GetByUserAsync(int userId, CancellationToken cancellationToken = default);
+        Task UpdateStatusByUserIdAsync(int userId, int statusId, CancellationToken cancellationToken = default);
         Task<List<Employee>?> GetByManagementCompanyIdAsync(int companyId, CancellationToken cancellationToken = default);
         Task<List<Employee>?> GetExecutorsByManagementCompanyIdAsync(int companyId, CancellationToken cancellationToken = default);
         Task<ManagementCompany?> GetManagementCompanyByAdminAsync(int adminId, CancellationToken cancellationToken = default);

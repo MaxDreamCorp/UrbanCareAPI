@@ -105,5 +105,19 @@ namespace UrbanCare.Infrastructure.Persistance.Repositories
             return await _context.Orders.CountAsync(o => o.Status.Id == (int)OrderStatusEnum.Completed
                && o.OrderExecutors.Any(oe => oe.Id == executorId), cancellationToken);
         }
+
+        public async Task UpdateStatusByUserIdAsync(int userId, int statusId, CancellationToken cancellationToken = default)
+        {
+            var status = await _context.EmployeeStatuses.FindAsync(statusId, cancellationToken);
+            if (status == null)
+                throw new Exception("Такого статуса не существует");
+
+            var employee = await _context.Employees.FirstOrDefaultAsync(e => e.UserId == userId, cancellationToken);
+            if (employee == null)
+                throw new Exception("Такого сотрудника не существует");
+
+            employee.Status = status;
+            await _context.SaveChangesAsync(cancellationToken);
+        }
     }
 }

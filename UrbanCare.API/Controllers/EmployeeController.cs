@@ -115,5 +115,49 @@ namespace UrbanCare.API.Controllers
 
             return Ok(response);
         }
+
+        [Authorize(Policy = "EmployeePolicy")]
+        [HttpPut("update_status_to_working")]
+        public async Task<IActionResult> UpdateStatusToWorking()
+        {
+            var userIdClaim = HttpContext.User.FindFirst("userId")?.Value;
+            if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
+                return Forbid();
+
+            var cmd = new UpdateEmployeeStatusToWorkingCommand(userId);
+
+            try
+            {
+                await _mediator.Send(cmd);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            return Ok();
+        }
+
+        [Authorize(Policy = "EmployeePolicy")]
+        [HttpPut("update_status_to_not_working")]
+        public async Task<IActionResult> UpdateStatusToNotWorking()
+        {
+            var userIdClaim = HttpContext.User.FindFirst("userId")?.Value;
+            if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
+                return Forbid();
+
+            var cmd = new UpdateEmployeeStatusToNotWorkingCommand(userId);
+
+            try
+            {
+                await _mediator.Send(cmd);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            return Ok();
+        }
     }
 }
