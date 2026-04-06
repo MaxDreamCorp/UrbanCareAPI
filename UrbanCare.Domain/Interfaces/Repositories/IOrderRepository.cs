@@ -15,6 +15,10 @@ namespace UrbanCare.Domain.Interfaces.Repositories
         Task<List<OrderExecutor>?> GetOrderExecutorsByIdAsync(int id, CancellationToken cancellationToken = default);
         Task<List<Order>> GetByManagementCompanyIdAsync(int managementCompanyId, CancellationToken cancellationToken = default);
         Task<List<Order>> GetByManagementCompanyIdAndStatusAsync(int managementCompanyId, OrderStatusEnum status, CancellationToken cancellationToken = default);
-
+        Task ChangeStatusAsync(int orderId, int statusId, CancellationToken cancellationToken = default);
+        Task SetAcceptedAtDateAsync(int orderId, DateTime acceptanceDate, CancellationToken cancellationToken = default);
+        Task SetCompletedAtDateAsync(int orderId, DateTime completionDate, CancellationToken cancellationToken = default);
+        Task AppointDispatcherAsync(int orderId, Employee dispatcher, CancellationToken cancellationToken = default);
+        Task AppointExecutorAsync(int orderId, Employee executor, CancellationToken cancellationToken = default);
     }
 }

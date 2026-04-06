@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using UrbanCare.Application.Features.DispatcherOperations.Commands;
 using UrbanCare.Application.Features.DispatcherOperations.Queries;
 
 namespace UrbanCare.API.Controllers
@@ -80,5 +81,19 @@ namespace UrbanCare.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-    }
+
+        [HttpPut("appoint_executor_to_order")]
+        public async Task<IActionResult> AssignExecutorToOrder(AppointExecutorToOrderCommand cmd)
+        {
+            try
+            {
+                await _mediator.Send(cmd);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        }
 }

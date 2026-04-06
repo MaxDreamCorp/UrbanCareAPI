@@ -75,6 +75,7 @@ namespace UrbanCare.Infrastructure.Persistance.Repositories
         public async Task<Employee?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             return await _context.Employees
+                .Include(e => e.User)
                 .Include(e => e.ManagementCompany)
                 .Include(e => e.EmployeePosition)
                 .Include(e => e.Status)
@@ -96,14 +97,15 @@ namespace UrbanCare.Infrastructure.Persistance.Repositories
 
         public async Task<int> GetExecutorActiveTasksCountAsync(int executorId, CancellationToken cancellationToken = default)
         {
-            return await _context.Orders.CountAsync(o => o.Status.Id == (int)OrderStatusEnum.InProgress
-                && o.OrderExecutors.Any(oe => oe.Id == executorId), cancellationToken);
+            return await _context.Orders.CountAsync(o => o.Status.Id >= (int)OrderStatusEnum.ExecutorAppointed
+                && o.Status.Id < (int)OrderStatusEnum.Completed
+                && o.OrderExecutors.Any(oe => oe.ExecutorId == executorId), cancellationToken);
         }
 
         public async Task<int> GetExecutorCompletedTasksCountAsync(int executorId, CancellationToken cancellationToken = default)
         {
             return await _context.Orders.CountAsync(o => o.Status.Id == (int)OrderStatusEnum.Completed
-               && o.OrderExecutors.Any(oe => oe.Id == executorId), cancellationToken);
+               && o.OrderExecutors.Any(oe => oe.ExecutorId == executorId), cancellationToken);
         }
 
         public async Task UpdateStatusByUserIdAsync(int userId, int statusId, CancellationToken cancellationToken = default)

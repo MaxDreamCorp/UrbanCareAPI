@@ -105,5 +105,74 @@ namespace UrbanCare.Infrastructure.Persistance.Repositories
             await _context.SaveChangesAsync(cancellationToken);
             return true;
         }
+
+        public async Task AppointDispatcherAsync(int orderId, Employee dispatcher, CancellationToken cancellationToken = default)
+        {
+            var order = await _context.Orders.FindAsync(orderId, cancellationToken);
+            if (order == null)
+                throw new Exception("Такого заказа не существует");
+
+            order.DispatcherId = dispatcher.Id;
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task AppointExecutorAsync(int orderId, Employee executor, CancellationToken cancellationToken = default)
+        {
+            var order = await _context.Orders.Include(o => o.OrderExecutors).FirstOrDefaultAsync(o => o.Id == orderId, cancellationToken);
+            if (order == null)
+                throw new Exception("Такого заказа не существует");
+
+            if (order.OrderExecutors.Any(oe => oe.Id == executor.Id))
+                throw new Exception("Этот исполнитель уже назначен на этот заказ");
+
+            OrderExecutor orderExecutor = new OrderExecutor
+            {
+                Id = _context.OrderExecutors.Any() ? _context.OrderExecutors.Max(oe => oe.Id) + 1 : 1,
+                OrderId = orderId,
+                ExecutorId = executor.Id
+            };
+            order.OrderExecutors.Add(orderExecutor);
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task ChangeStatusAsync(int orderId, int statusId, CancellationToken cancellationToken = default)
+        {
+            var order = await _context.Orders.FindAsync(orderId, cancellationToken);
+            if (order == null)
+                throw new Exception("Такого заказа не существует");
+
+            var status = await _context.OrderStatuses.FindAsync(statusId, cancellationToken);
+            if (status == null)
+                throw new Exception("Такого статуса не существует");
+
+            order.Status = status;
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task SetAcceptedAtDateAsync(int orderId, DateTime acceptanceDate, CancellationToken cancellationToken = default)
+        {
+            var order = await _context.Orders.FindAsync(orderId, cancellationToken);
+            if (order == null)
+                throw new Exception("Такого заказа не существует");
+
+            if (order.AcceptedAt != null)
+                throw new Exception("Дата принятия уже установлена");
+
+            order.AcceptedAt = acceptanceDate;
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task SetCompletedAtDateAsync(int orderId, DateTime completionDate, CancellationToken cancellationToken = default)
+        {
+            var order = await _context.Orders.FindAsync(orderId, cancellationToken);
+            if (order == null)
+                throw new Exception("Такого заказа не существует");
+
+            if (order.CompletedAt != null)
+                throw new Exception("Дата завершения уже установлена");
+
+            order.CompletedAt = completionDate;
+            await _context.SaveChangesAsync(cancellationToken);
+        }
     }
 }
