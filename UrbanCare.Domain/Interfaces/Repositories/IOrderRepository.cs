@@ -22,6 +22,5 @@ namespace UrbanCare.Domain.Interfaces.Repositories
         Task AppointDispatcherAsync(int orderId, Employee dispatcher, CancellationToken cancellationToken = default);
         Task AppointExecutorAsync(int orderId, Employee executor, CancellationToken cancellationToken = default);
         Task<bool> CheckIfExecutorIsAppointedToOrderAsync(int orderId, int executorId, CancellationToken cancellationToken = default);
-        Task MarkAsCompletedByExecutorAsync(int orderId, CancellationToken cancellationToken = default);
     }
 }

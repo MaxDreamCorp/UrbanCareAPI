@@ -97,5 +97,25 @@ namespace UrbanCare.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPut("accept_order/{orderId}")]
+        public async Task<IActionResult> AcceptOrder(int orderId)
+        {
+            var userIdClaim = HttpContext.User.FindFirst("userId")?.Value;
+            if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
+                return Forbid();
+
+            var cmd = new AcceptOrderCommand(userId, orderId);
+
+            try
+            {
+                await _mediator.Send(cmd);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

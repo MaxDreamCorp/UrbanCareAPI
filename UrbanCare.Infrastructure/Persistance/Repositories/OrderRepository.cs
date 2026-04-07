@@ -190,14 +190,5 @@ namespace UrbanCare.Infrastructure.Persistance.Repositories
             return await _context.OrderExecutors.AnyAsync(oe => oe.OrderId == orderId && oe.ExecutorId == executorId, cancellationToken);
         }
 
-        public async Task MarkAsCompletedByExecutorAsync(int orderId, CancellationToken cancellationToken = default)
-        {
-            var order = await _context.Orders.FindAsync(orderId, cancellationToken);
-            if (order == null)
-                throw new Exception("Такого заказа не существует");
-
-            order.StatusId = (int)OrderStatusEnum.MarkedAsCompletedByExecutor;
-            await _context.SaveChangesAsync(cancellationToken);
-        }
     }
 }
