@@ -16,5 +16,6 @@ namespace UrbanCare.Domain.Interfaces.Repositories
         Task<Employee?> GetAdminByManagementCompanyAsync(int managementCompanyId, CancellationToken cancellationToken = default);
         Task<int> GetExecutorActiveTasksCountAsync(int executorId, CancellationToken cancellationToken = default);
         Task<int> GetExecutorCompletedTasksCountAsync(int executorId, CancellationToken cancellationToken = default);
+        Task SetExecutorWorkPaymentForOrderAsync(int executorId, int orderId, decimal payment, CancellationToken cancellationToken = default);
     }
 }

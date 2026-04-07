@@ -78,14 +78,14 @@ namespace UrbanCare.API.Controllers
             }
         }
 
-        [HttpPut("mark_as_completed/{orderId}")]
-        public async Task<IActionResult> MarkAsCompleted(int orderId)
+        [HttpPut("mark_as_completed")]
+        public async Task<IActionResult> MarkAsCompleted(MarkAsCompletedByExecutorCommand cmd)
         {
             var userIdClaim = HttpContext.User.FindFirst("userId")?.Value;
             if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
                 return Forbid();
 
-            var cmd = new MarkAsCompletedByExecutorCommand(userId, orderId);
+            cmd = new MarkAsCompletedByExecutorCommand(userId, cmd.OrderId, cmd.WorkPayment);
 
             try
             {

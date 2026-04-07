@@ -121,5 +121,16 @@ namespace UrbanCare.Infrastructure.Persistance.Repositories
             employee.Status = status;
             await _context.SaveChangesAsync(cancellationToken);
         }
+
+        public async Task SetExecutorWorkPaymentForOrderAsync(int executorId, int orderId, decimal payment, CancellationToken cancellationToken = default)
+        {
+            var orderExecutor = await _context.OrderExecutors.FirstOrDefaultAsync(oe => oe.ExecutorId == executorId && oe.OrderId == orderId, cancellationToken);
+            if (orderExecutor == null)
+                throw new Exception("Такой исполнитель не назначен на этот заказ");
+
+            orderExecutor.WorkPayment = payment;
+            await _context.SaveChangesAsync(cancellationToken);
+
+        }
     }
 }

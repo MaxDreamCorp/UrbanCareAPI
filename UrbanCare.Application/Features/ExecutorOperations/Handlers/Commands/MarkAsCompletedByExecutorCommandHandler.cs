@@ -34,6 +34,7 @@ namespace UrbanCare.Application.Features.ExecutorOperations.Handlers.Commands
                 throw new Exception("Исполнитель не назначен на этот заказ.");
 
             await _orderRepository.ChangeStatusAsync(request.OrderId, (int)Domain.Enums.OrderStatusEnum.MarkedAsCompletedByExecutor, cancellationToken);
+            await _employeeRepository.SetExecutorWorkPaymentForOrderAsync(executor.Id, request.OrderId, request.WorkPayment, cancellationToken);
         }
     }
 }
