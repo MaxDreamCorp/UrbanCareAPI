@@ -190,5 +190,28 @@ namespace UrbanCare.Infrastructure.Persistance.Repositories
             return await _context.OrderExecutors.AnyAsync(oe => oe.OrderId == orderId && oe.ExecutorId == executorId, cancellationToken);
         }
 
+        public async Task ConfirmCompletionByResidentAsync(int orderId, Resident resident, CancellationToken cancellationToken = default)
+        {
+            var order = await _context.Orders.FindAsync(orderId, cancellationToken);
+            if (order == null)
+                throw new Exception("Такого заказа не существует");
+
+            if (order.ResidentId != resident.Id)
+                throw new Exception("Этот заказ не принадлежит этому жителю");
+
+            if (order.StatusId != (int)OrderStatusEnum.MarkedAsCompletedByExecutor)
+                throw new Exception("Заказ не находится в статусе 'Отмечен как выполненный исполнителем'");
+
+            if (await _context.OrderExecutors.AnyAsync(oe => oe.OrderId == orderId && oe.WorkPayment != null && oe.WorkPayment > 0, cancellationToken)
+                || await _context.OrderMaterials.AnyAsync(om => om.OrderId == orderId, cancellationToken))
+                order.StatusId = (int)OrderStatusEnum.PendingPayment;
+            else
+            {
+                order.StatusId = (int)OrderStatusEnum.Completed;
+                order.CompletedAt = DateTime.Now;
+            }
+
+                await _context.SaveChangesAsync(cancellationToken);
+        }
     }
 }

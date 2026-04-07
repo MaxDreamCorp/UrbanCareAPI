@@ -70,6 +70,25 @@ namespace UrbanCare.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [Authorize(Policy = "ResidentPolicy")]
+        [HttpPut("confirm_order_completion/{orderId}")]
+        public async Task<IActionResult> ConfirmOrderCompletion(int orderId)
+        {
+            var userIdClaim = HttpContext.User.FindFirst("userId")?.Value;
+            if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
+                return Forbid();
+            try
+            {
+                var cmd = new ConfirmOrderCompletionCommand(userId, orderId);
+                await _mediator.Send(cmd);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
 
