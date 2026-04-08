@@ -49,6 +49,7 @@ namespace UrbanCare.API.Extensions
             services.AddScoped<IOrderCategoryRepository, OrderCategoryRepository>();
             services.AddScoped<IOrderStatusRepository, OrderStatusRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<IMaterialRepository, MaterialRepository>();
 
             services.AddScoped<GettingDataService>();
 
@@ -97,7 +98,7 @@ namespace UrbanCare.API.Extensions
                         var roleClaim = context.User.FindFirst("roleId");
                         if (roleClaim != null && int.TryParse(roleClaim.Value, out int roleId))
                         {
-                            return roleId < (int)RolesEnum.Resident;
+                            return roleId < (int)RolesEnum.Resident && roleId > (int)RolesEnum.Developer;
                         }
                         return false;
                     });

@@ -153,6 +153,21 @@ namespace UrbanCare.API.Controllers
             }
         }
 
+        [Authorize(Policy = "EmployeePolicy")]
+        [HttpGet("material/get_company_materials/{managementCompanyId}")]
+        public async Task<IActionResult> GetCompanyMaterials(int managementCompanyId)
+        {
+            var qry = new GetCompanyMaterialsQuery(managementCompanyId);
 
+            try
+            {
+                var response = await _mediator.Send(qry);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

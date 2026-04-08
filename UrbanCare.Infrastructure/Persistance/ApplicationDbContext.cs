@@ -338,6 +338,8 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.Unit)
                 .HasMaxLength(150)
                 .HasColumnName("unit");
+            entity.Property(e => e.AmountAtStorage)
+                .HasColumnName("amount_at_storage");
 
             entity.HasOne(d => d.Storage).WithMany(p => p.Materials)
                 .HasForeignKey(d => d.StorageId)

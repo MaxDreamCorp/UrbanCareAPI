@@ -10,6 +10,8 @@ public partial class Material
 
     public decimal Price { get; set; }
 
+    public int AmountAtStorage { get; set; }
+
     public int StorageId { get; set; }
 
     public virtual ICollection<OrderMaterial> OrderMaterials { get; set; } = new List<OrderMaterial>();

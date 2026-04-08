@@ -206,9 +206,13 @@ namespace UrbanCare.Application.Services
                     om.OrderId,
                     new(
                         om.Material.Id,
+                        new(
+                            om.Material.Storage.Id,
+                            om.Material.Storage.Name),
                         om.Material.Name,
                         om.Material.Unit,
-                        om.Material.Price),
+                        om.Material.Price,
+                        om.Material.AmountAtStorage),
                     om.Quantity)).ToList();
 
             return new OrderResponseDTO(

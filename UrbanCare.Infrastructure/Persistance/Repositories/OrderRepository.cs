@@ -77,6 +77,7 @@ namespace UrbanCare.Infrastructure.Persistance.Repositories
         {
             return await _context.OrderMaterials
                 .Include(om => om.Material)
+                    .ThenInclude(m => m.Storage)
                 .Where(om => om.OrderId == id)
                 .ToListAsync(cancellationToken);
         }
@@ -211,7 +212,7 @@ namespace UrbanCare.Infrastructure.Persistance.Repositories
                 order.CompletedAt = DateTime.Now;
             }
 
-                await _context.SaveChangesAsync(cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }
