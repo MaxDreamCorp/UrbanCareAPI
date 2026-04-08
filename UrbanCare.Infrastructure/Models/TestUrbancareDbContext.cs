@@ -66,6 +66,8 @@ public partial class TestUrbancareDbContext : DbContext
 
     public virtual DbSet<SessionStatus> SessionStatuses { get; set; }
 
+    public virtual DbSet<Storage> Storages { get; set; }
+
     public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<UserPersonalDatum> UserPersonalData { get; set; }
@@ -330,6 +332,8 @@ public partial class TestUrbancareDbContext : DbContext
 
             entity.ToTable("materials");
 
+            entity.HasIndex(e => e.StorageId, "FK_material_storage_idx");
+
             entity.Property(e => e.Id)
                 .ValueGeneratedNever()
                 .HasColumnName("id");
@@ -339,9 +343,14 @@ public partial class TestUrbancareDbContext : DbContext
             entity.Property(e => e.Price)
                 .HasPrecision(10, 2)
                 .HasColumnName("price");
+            entity.Property(e => e.StorageId).HasColumnName("storage_id");
             entity.Property(e => e.Unit)
                 .HasMaxLength(150)
                 .HasColumnName("unit");
+
+            entity.HasOne(d => d.Storage).WithMany(p => p.Materials)
+                .HasForeignKey(d => d.StorageId)
+                .HasConstraintName("FK_material_storage");
         });
 
         modelBuilder.Entity<Order>(entity =>
@@ -467,6 +476,9 @@ public partial class TestUrbancareDbContext : DbContext
                 .HasColumnName("id");
             entity.Property(e => e.ExecutorId).HasColumnName("executor_id");
             entity.Property(e => e.OrderId).HasColumnName("order_id");
+            entity.Property(e => e.WorkPayment)
+                .HasPrecision(10, 2)
+                .HasColumnName("work_payment");
 
             entity.HasOne(d => d.Executor).WithMany(p => p.OrderExecutors)
                 .HasForeignKey(d => d.ExecutorId)
@@ -515,7 +527,7 @@ public partial class TestUrbancareDbContext : DbContext
                 .ValueGeneratedNever()
                 .HasColumnName("id");
             entity.Property(e => e.Status)
-                .HasMaxLength(20)
+                .HasMaxLength(40)
                 .HasColumnName("status");
         });
 
@@ -575,8 +587,6 @@ public partial class TestUrbancareDbContext : DbContext
 
             entity.HasIndex(e => e.PaymentMethodId, "FK_payment_payment_method_idx");
 
-            entity.HasIndex(e => e.ResidentId, "FK_payment_resident_idx");
-
             entity.Property(e => e.Id)
                 .ValueGeneratedNever()
                 .HasColumnName("id");
@@ -591,7 +601,6 @@ public partial class TestUrbancareDbContext : DbContext
                 .HasMaxLength(255)
                 .HasColumnName("payment_code");
             entity.Property(e => e.PaymentMethodId).HasColumnName("payment_method_id");
-            entity.Property(e => e.ResidentId).HasColumnName("resident_id");
 
             entity.HasOne(d => d.Order).WithMany(p => p.Payments)
                 .HasForeignKey(d => d.OrderId)
@@ -602,11 +611,6 @@ public partial class TestUrbancareDbContext : DbContext
                 .HasForeignKey(d => d.PaymentMethodId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_payment_payment_method");
-
-            entity.HasOne(d => d.Resident).WithMany(p => p.Payments)
-                .HasForeignKey(d => d.ResidentId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_payment_resident");
         });
 
         modelBuilder.Entity<PaymentMethod>(entity =>
@@ -757,6 +761,27 @@ public partial class TestUrbancareDbContext : DbContext
                 .HasColumnName("status")
                 .UseCollation("utf8mb3_general_ci")
                 .HasCharSet("utf8mb3");
+        });
+
+        modelBuilder.Entity<Storage>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("storages");
+
+            entity.HasIndex(e => e.ManagementCompanyId, "FK_storage_management_company_idx");
+
+            entity.Property(e => e.Id)
+                .ValueGeneratedNever()
+                .HasColumnName("id");
+            entity.Property(e => e.ManagementCompanyId).HasColumnName("management_company_id");
+            entity.Property(e => e.Name)
+                .HasMaxLength(255)
+                .HasColumnName("name");
+
+            entity.HasOne(d => d.ManagementCompany).WithMany(p => p.Storages)
+                .HasForeignKey(d => d.ManagementCompanyId)
+                .HasConstraintName("FK_storage_management_company");
         });
 
         modelBuilder.Entity<User>(entity =>

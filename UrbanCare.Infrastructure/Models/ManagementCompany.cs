@@ -14,4 +14,6 @@ public partial class ManagementCompany
     public virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();
 
     public virtual ICollection<Region> Regions { get; set; } = new List<Region>();
+
+    public virtual ICollection<Storage> Storages { get; set; } = new List<Storage>();
 }

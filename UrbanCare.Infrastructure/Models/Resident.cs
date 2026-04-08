@@ -21,7 +21,5 @@ public partial class Resident
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 
-    public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
-
     public virtual User User { get; set; } = null!;
 }

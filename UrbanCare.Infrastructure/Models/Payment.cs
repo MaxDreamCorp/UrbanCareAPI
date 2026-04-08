@@ -9,8 +9,6 @@ public partial class Payment
 
     public int OrderId { get; set; }
 
-    public int ResidentId { get; set; }
-
     public decimal Amount { get; set; }
 
     public int PaymentMethodId { get; set; }
@@ -22,6 +20,4 @@ public partial class Payment
     public virtual Order Order { get; set; } = null!;
 
     public virtual PaymentMethod PaymentMethod { get; set; } = null!;
-
-    public virtual Resident Resident { get; set; } = null!;
 }

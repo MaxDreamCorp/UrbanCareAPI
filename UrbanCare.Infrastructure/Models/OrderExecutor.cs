@@ -11,6 +11,8 @@ public partial class OrderExecutor
 
     public int ExecutorId { get; set; }
 
+    public decimal? WorkPayment { get; set; }
+
     public virtual Employee Executor { get; set; } = null!;
 
     public virtual Order Order { get; set; } = null!;
