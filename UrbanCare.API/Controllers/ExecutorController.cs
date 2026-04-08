@@ -117,5 +117,25 @@ namespace UrbanCare.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPost("add_materials_to_order")]
+        public async Task<IActionResult> AddMaterialsToOrder(AddMaterialsToOrderCommand cmd)
+        {
+            var userIdClaim = HttpContext.User.FindFirst("userId")?.Value;
+            if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
+                return Forbid();
+
+            cmd = new AddMaterialsToOrderCommand(userId, cmd.OrderId, cmd.Materials);
+
+            try
+            {
+                await _mediator.Send(cmd);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

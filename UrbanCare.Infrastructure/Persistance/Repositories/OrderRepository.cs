@@ -214,5 +214,28 @@ namespace UrbanCare.Infrastructure.Persistance.Repositories
 
             await _context.SaveChangesAsync(cancellationToken);
         }
+
+        public async Task AddMaterialAsync(int orderId, Material material, int quantity, CancellationToken cancellationToken = default)
+        {
+            var order = await _context.Orders.Include(o => o.OrderMaterials).FirstOrDefaultAsync(o => o.Id == orderId, cancellationToken);
+            if (order == null)
+                throw new Exception("Такого заказа не существует");
+
+            if (order.OrderMaterials.Any(om => om.MaterialId == material.Id))
+                order.OrderMaterials.First(om => om.MaterialId == material.Id).Quantity = quantity;
+            else
+            {
+                OrderMaterial orderMaterial = new OrderMaterial
+                {
+                    Id = _context.OrderMaterials.Any() ? _context.OrderMaterials.Max(om => om.Id) + 1 : 1,
+                    OrderId = orderId,
+                    MaterialId = material.Id,
+                    Quantity = quantity
+                };
+                order.OrderMaterials.Add(orderMaterial);
+            }
+
+            await _context.SaveChangesAsync(cancellationToken);
+        }
     }
 }
