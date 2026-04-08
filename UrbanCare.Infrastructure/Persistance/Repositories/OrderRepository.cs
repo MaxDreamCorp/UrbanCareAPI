@@ -215,27 +215,31 @@ namespace UrbanCare.Infrastructure.Persistance.Repositories
             await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task AddMaterialAsync(int orderId, Material material, int quantity, CancellationToken cancellationToken = default)
+        public async Task AddMaterialsAsync(int orderId, Dictionary<Material, int> materials, CancellationToken cancellationToken = default)
         {
             var order = await _context.Orders.Include(o => o.OrderMaterials).FirstOrDefaultAsync(o => o.Id == orderId, cancellationToken);
             if (order == null)
                 throw new Exception("Такого заказа не существует");
 
-            if (order.OrderMaterials.Any(om => om.MaterialId == material.Id))
-                order.OrderMaterials.First(om => om.MaterialId == material.Id).Quantity = quantity;
-            else
+            for (int i = 0; i < materials.Count; i++)
             {
+                var material = materials.Keys.ElementAt(i);
+                var quantity = materials[material];
+                if (i == 0)
+                    order.OrderMaterials.Clear();
+
                 OrderMaterial orderMaterial = new OrderMaterial
                 {
-                    Id = _context.OrderMaterials.Any() ? _context.OrderMaterials.Max(om => om.Id) + 1 : 1,
-                    OrderId = orderId,
-                    MaterialId = material.Id,
+                    Id = _context.OrderMaterials.Any() ? _context.OrderMaterials.Max(o => o.Id) + 1 : 1,
+                    Order = order,
+                    Material = material,
                     Quantity = quantity
                 };
+
                 order.OrderMaterials.Add(orderMaterial);
+            await _context.SaveChangesAsync(cancellationToken);
             }
 
-            await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

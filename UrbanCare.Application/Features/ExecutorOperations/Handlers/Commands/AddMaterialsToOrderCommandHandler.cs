@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using UrbanCare.Application.Features.ExecutorOperations.Commands;
+using UrbanCare.Domain.Entities;
 using UrbanCare.Domain.Interfaces.Repositories;
 
 namespace UrbanCare.Application.Features.ExecutorOperations.Handlers.Commands
@@ -30,14 +31,18 @@ namespace UrbanCare.Application.Features.ExecutorOperations.Handlers.Commands
             if (!await _orderRepository.CheckIfExecutorIsAppointedToOrderAsync(request.OrderId, executor.Id, cancellationToken))
                 throw new Exception("Исполнитель не назначен на данный заказ");
 
+            Dictionary<Material, int> materials = new();
+
             foreach (var materialIdQuantityPair in request.Materials)
             {
                 var material = await _materialRepository.GetByIdAsync(materialIdQuantityPair.Key, cancellationToken);
                 if (material == null)
                     throw new Exception($"Материал с id {materialIdQuantityPair.Key} не найден");
 
-                _orderRepository.AddMaterialAsync(order.Id, material, materialIdQuantityPair.Value, cancellationToken).Wait(cancellationToken);
+                materials.Add(material, materialIdQuantityPair.Value);
             }
+
+            await _orderRepository.AddMaterialsAsync(order.Id, materials, cancellationToken);
         }
     }
 }
