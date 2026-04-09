@@ -23,6 +23,7 @@ namespace UrbanCare.Domain.Interfaces.Repositories
         Task AppointExecutorAsync(int orderId, Employee executor, CancellationToken cancellationToken = default);
         Task ConfirmCompletionByResidentAsync(int orderId, Resident resident, CancellationToken cancellationToken = default);
         Task AddMaterialsAsync(int orderId, Dictionary<Material, int> materials, CancellationToken cancellationToken = default);
+        Task ExpendMaterialsAsync(int orderId, CancellationToken cancellationToken = default);
         Task<bool> CheckIfExecutorIsAppointedToOrderAsync(int orderId, int executorId, CancellationToken cancellationToken = default);
     }
 }

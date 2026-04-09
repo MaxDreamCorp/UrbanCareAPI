@@ -8,6 +8,7 @@ using UrbanCare.Application.Features.ResidentOperations.Queries;
 namespace UrbanCare.API.Controllers
 {
     [Route("api/resident")]
+    [Authorize(Policy = "ResidentPolicy")]
     [ApiController]
     public class ResidentController : ControllerBase
     {
@@ -33,7 +34,6 @@ namespace UrbanCare.API.Controllers
             }
         }
 
-        [Authorize(Policy = "ResidentPolicy")]
         [HttpGet("get_my_resident_data")]
         public async Task<IActionResult> GetMyResidentData()
         {
@@ -46,7 +46,6 @@ namespace UrbanCare.API.Controllers
             return Ok(response);
         }
 
-        [Authorize(Policy = "ResidentPolicy")]
         [HttpGet("get_my_orders")]
         public async Task<IActionResult> GetMyOrders()
         {
@@ -71,7 +70,6 @@ namespace UrbanCare.API.Controllers
             }
         }
 
-        [Authorize(Policy = "ResidentPolicy")]
         [HttpPut("confirm_order_completion/{orderId}")]
         public async Task<IActionResult> ConfirmOrderCompletion(int orderId)
         {
@@ -81,6 +79,24 @@ namespace UrbanCare.API.Controllers
             try
             {
                 var cmd = new ConfirmOrderCompletionCommand(userId, orderId);
+                await _mediator.Send(cmd);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("imitate_payment/{orderId}")]
+        public async Task<IActionResult> ImitatePayment(int orderId)
+        {
+            var userIdClaim = HttpContext.User.FindFirst("userId")?.Value;
+            if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
+                return Forbid();
+            try
+            {
+                var cmd = new PayForOrderCommand(userId, orderId);
                 await _mediator.Send(cmd);
                 return Ok();
             }
