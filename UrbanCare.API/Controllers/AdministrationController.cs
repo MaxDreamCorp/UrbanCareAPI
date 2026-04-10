@@ -56,7 +56,7 @@ namespace UrbanCare.API.Controllers
             }
         }
 
-      
+
         [HttpPut("region/update_region")]
         public async Task<IActionResult> UpdateRegion(UpdateRegionCommand cmd)
         {
@@ -183,7 +183,5 @@ namespace UrbanCare.API.Controllers
                 return NotFound(ex.Message);
             }
         }
-
     }
-
 }

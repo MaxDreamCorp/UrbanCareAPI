@@ -33,7 +33,5 @@ namespace UrbanCare.API.Controllers
 
             return Ok(response);
         }
-
-
     }
 }
